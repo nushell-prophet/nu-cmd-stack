@@ -1,8 +1,11 @@
 export def --env init [
-    commands?: list = ['print a' 'print b' 'print c']
+    commands?: list
 ] {
+    let $commands = if $commands == null {} else { $commands }
+        | default []
+
     $env.nu-com-stack = {
-        cursor: -1
+        index: -1
         stack: $commands
     }
 
@@ -33,38 +36,38 @@ export def --env init [
     )
 }
 
-export def --env increment-cursor [
+export def --env increment-index [
     steps?: int = 1
     --reset
 ] {
-    let cursor = if $reset { 0 } else {
-            $env.nu-com-stack?.cursor?
+    let index = if $reset { 0 } else {
+            $env.nu-com-stack?.index?
             | default (-1)
             | $in + $steps
         }
         | [0 $in]
         | math max
 
-    $env.nu-com-stack.cursor = $cursor
+    $env.nu-com-stack.index = $index
 
-    $cursor
+    $index
 }
 
 export def --env next [] {
-    increment-cursor 1
-    | commandline-cursor
+    increment-index 1
+    | command-to-line
 }
 
 export def --env prev [] {
-    increment-cursor (-1)
-    | commandline-cursor
+    increment-index (-1)
+    | command-to-line
 }
 
-def commandline-cursor [] {
-    let $cursor = $in
+def command-to-line [] {
+    let $index = $in
 
     $env.nu-com-stack?.stack?
-    | get -i $cursor
-    | default $'# There are no commands left. The poistion of cursor is ($cursor)'
+    | get -i $index
+    | default $'# There are no commands left. The poistion of index is ($index)'
     | commandline edit -r $in
 }
