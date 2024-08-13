@@ -11,33 +11,30 @@ export def --env increment-cursor [
     steps?: int = 1
     --reset
 ] {
-    $env.nuqueue.cursor = (
-        if $reset { 0 } else {
-            $env.nuqueue.cursor + $steps
-        }
-    )
+    let cursor = if $reset { 0 } else { $env.nuqueue.cursor + $steps }
+        | [0 $in]
+        | math max
+
+    $env.nuqueue.cursor = $cursor
+
+    $cursor
 }
 
 export def --env next [] {
     increment-cursor 1
-
-    $env.nuqueue.stack
-    | get -i $env.nuqueue.cursor
-    | if $in == null {
-        print 'There are no commands left'
-    } else {
-        commandline edit -r $in
-    }
+    | commandline-cursor
 }
 
 export def --env prev [] {
     increment-cursor (-1)
+    | commandline-cursor
+}
 
-    $env.nuqueue
-    | get -i $env.nuqueue.cursor
-    | if $in == null {
-        print 'There are no commands left'
-    } else {
-        commandline edit -r $in
-    }
+def commandline-cursor [] {
+    let $cursor = $in
+
+    $env.nuqueue.stack
+    | get -i $cursor
+    | default $'# There are no commands left. Cursor poistion is ($cursor)'
+    | commandline edit -r $in
 }
