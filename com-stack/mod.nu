@@ -4,12 +4,12 @@ export def --env init [
     let $commands = if $commands == null {} else { $commands }
         | default []
 
-    $env.nu-com-stack = {
+    $env.com-stack = {
         index: -1
         stack: $commands
     }
 
-    if 'nu-com-stack-next' not-in $env.config.keybindings.name {
+    if 'com-stack-next' not-in $env.config.keybindings.name {
         add-keybindings
     }
 }
@@ -19,14 +19,14 @@ export def --env increment-index [
     --reset
 ] {
     let index = if $reset { 0 } else {
-            $env.nu-com-stack?.index?
+            $env.com-stack?.index?
             | default (-1)
             | $in + $steps
         }
         | [0 $in]
         | math max
 
-    $env.nu-com-stack.index = $index
+    $env.com-stack.index = $index
 
     $index
 }
@@ -44,7 +44,7 @@ export def --env prev [] {
 def command-to-line [] {
     let $index = $in
 
-    $env.nu-com-stack?.stack?
+    $env.com-stack?.stack?
     | get -i $index
     | default $'# There are no commands left. The poistion of index is ($index)'
     | commandline edit -r $in
@@ -56,23 +56,23 @@ def add-keybindings [] {
             $env.config.keybindings
             | append [
                 {
-                    name: nu-com-stack-next
+                    name: com-stack-next
                     modifier: control_alt
                     keycode: char_k
                     mode: [emacs, vi_normal, vi_insert]
                     event: {
                         send: executehostcommand
-                        cmd: 'nu-com-stack next'
+                        cmd: 'com-stack next'
                     }
                 }
                 {
-                    name: nu-com-stack-prev
+                    name: com-stack-prev
                     modifier: control_alt
                     keycode: char_j
                     mode: [emacs, vi_normal, vi_insert]
                     event: {
                         send: executehostcommand
-                        cmd: 'nu-com-stack prev'
+                        cmd: 'com-stack prev'
                     }
                 }
             ]
