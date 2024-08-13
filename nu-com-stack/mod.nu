@@ -5,6 +5,32 @@ export def --env init [
         cursor: -1
         stack: $commands
     }
+
+    $env.config.keybindings = ($env.config.keybindings
+        | append [
+            {
+                name: nu-com-stack-next
+                modifier: control_alt
+                keycode: char_k
+                mode: [emacs, vi_normal, vi_insert]
+                event: {
+                    send: executehostcommand
+                    cmd: 'nu-com-stack next'
+                }
+            }
+            {
+                name: nu-com-stack-prev
+                modifier: control_alt
+                keycode: char_j
+                mode: [emacs, vi_normal, vi_insert]
+                event: {
+                    send: executehostcommand
+                    cmd: 'nu-com-stack prev'
+                }
+            }
+        ]
+        | uniq-by name modifier keycode
+    )
 }
 
 export def --env increment-cursor [
