@@ -4,12 +4,12 @@ export def --env init [
     let $commands = if $commands == null {} else { $commands }
         | default []
 
-    $env.com-stack = {
+    $env.cmd-stack = {
         index: -1
         stack: $commands
     }
 
-    if 'com-stack-next' not-in $env.config.keybindings.name {
+    if 'cmd-stack-next' not-in $env.config.keybindings.name {
         add-keybindings
     }
 }
@@ -19,14 +19,14 @@ export def --env increment-index [
     --reset
 ] {
     let index = if $reset { 0 } else {
-            $env.com-stack?.index?
+            $env.cmd-stack?.index?
             | default (-1)
             | $in + $steps
         }
         | [0 $in]
         | math max
 
-    $env.com-stack.index = $index
+    $env.cmd-stack.index = $index
 
     $index
 }
@@ -44,7 +44,7 @@ export def --env prev [] {
 def command-to-line [] {
     let $index = $in
 
-    $env.com-stack?.stack?
+    $env.cmd-stack?.stack?
     | get -i $index
     | default $'# There are no commands left. The poistion of index is ($index)'
     | commandline edit -r $in
@@ -56,23 +56,23 @@ def add-keybindings [] {
             $env.config.keybindings
             | append [
                 {
-                    name: com-stack-next
+                    name: cmd-stack-next
                     modifier: control_alt
                     keycode: char_k
                     mode: [emacs, vi_normal, vi_insert]
                     event: {
                         send: executehostcommand
-                        cmd: 'com-stack next'
+                        cmd: 'cmd-stack next'
                     }
                 }
                 {
-                    name: com-stack-prev
+                    name: cmd-stack-prev
                     modifier: control_alt
                     keycode: char_j
                     mode: [emacs, vi_normal, vi_insert]
                     event: {
                         send: executehostcommand
-                        cmd: 'com-stack prev'
+                        cmd: 'cmd-stack prev'
                     }
                 }
             ]
