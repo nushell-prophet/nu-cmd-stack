@@ -20,7 +20,7 @@
 ```nushell no-run
 # Here we fill `cmd-stack` with the commands from `demo.nu`.
 # We divide commands here by empty lines
-> open demo.nu | split row "\n\n" | cmd-stack init
+> open demo.nu | split row "\n\n" | skip | cmd-stack init
 ```
 
 ```nushell no-run
