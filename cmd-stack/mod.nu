@@ -81,9 +81,6 @@ def add-keybindings [] {
     }
 
     view source $closure
-    | lines
-    | skip
-    | drop
-    | str join (char nl)
+    | str substring 2..-2
     | commandline edit -r $in
 }
