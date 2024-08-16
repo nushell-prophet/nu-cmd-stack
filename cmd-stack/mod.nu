@@ -6,6 +6,7 @@ export def main [] {
     } else {}
 }
 
+# initialize cmd-stack
 export def --env init [
     commands?: list
 ] {
