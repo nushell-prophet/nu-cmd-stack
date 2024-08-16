@@ -52,7 +52,8 @@ def --env command-to-line [] {
 
     if $index > ($stack_length - 1) {
         update-index (-1)
-        ($"# There are no more commands in the stack. The length of stack is: ($stack_length)")
+        ($"# There are only ($stack_length) commands in the stack, and you are at the very end of it.\n" +
+        "# Use `cmd-stack prev` or the corresponding keybinding.")
     } else if $index < 0 {
         $env.cmd-stack.stack
         | get -i (update-index --set 0)
