@@ -27,16 +27,6 @@ export def --env init [
     }
 }
 
-def --env update-index [
-    steps?: int = 1
-] {
-    let $index = $env.cmd-stack.index + $steps
-
-    $env.cmd-stack.index = $index
-
-    $index
-}
-
 export def --env next [] {
     cmd-cycle 1
 }
@@ -57,7 +47,7 @@ def --env cmd-cycle [
     } else if $index < 0 {
         $"# You are at the beginning of the stack. Use `cmd-stack next` or the corresponding keybinding."
     } else {
-        update-index $steps
+        $env.cmd-stack.index = $index
 
         $env.cmd-stack.stack
         | get $index
