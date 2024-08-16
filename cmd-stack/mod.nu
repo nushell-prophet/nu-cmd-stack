@@ -1,3 +1,9 @@
+# A module to scroll through the list of commands using `ctrl+alt+j/k` shortcuts
+# The list of commands can be piped to `cmd-stack init`.
+
+# Thanks to @weirdan for the inspiration!
+# https://discord.com/channels/601130461678272522/615253963645911060/1270752014506397736
+
 # Show current state of cmd-stack
 export def main [] {
     $env.cmd-stack?
