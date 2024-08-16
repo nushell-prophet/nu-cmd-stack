@@ -69,32 +69,23 @@ def setup-keybindings [] {
     # I use commandline edit here as I can't modify keybindings from custom command
     # bugreport: https://github.com/nushell/nushell/issues/13636
     let $closure = {
-        $env.config.keybindings = (
-            $env.config.keybindings
-            | append [
-                {
-                    name: cmd-stack-next
-                    modifier: control_alt
-                    keycode: char_k
-                    mode: [emacs, vi_normal, vi_insert]
-                    event: {
-                        send: executehostcommand
-                        cmd: 'cmd-stack next'
-                    }
-                }
-                {
-                    name: cmd-stack-prev
-                    modifier: control_alt
-                    keycode: char_j
-                    mode: [emacs, vi_normal, vi_insert]
-                    event: {
-                        send: executehostcommand
-                        cmd: 'cmd-stack prev'
-                    }
-                }
-            ]
-            | uniq-by name modifier keycode
-        )
+        # here we add keybindings for `cmd-stack`
+        $env.config.keybindings ++= [
+            {
+                name: cmd-stack-next
+                modifier: control_alt
+                keycode: char_k
+                mode: [emacs, vi_normal, vi_insert]
+                event: { send: executehostcommand cmd: 'cmd-stack next' }
+            }
+            {
+                name: cmd-stack-prev
+                modifier: control_alt
+                keycode: char_j
+                mode: [emacs, vi_normal, vi_insert]
+                event: { send: executehostcommand cmd: 'cmd-stack prev' }
+            }
+        ]
     }
 
     view source $closure
