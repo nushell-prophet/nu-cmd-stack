@@ -10,7 +10,8 @@ export def main [] {
 export def --env init [
     commands?: list
 ] {
-    let $commands = if $commands == null {} else { $commands }
+    let $commands = $in
+        | if $commands == null {} else { $commands }
 
     if $commands == null {
         print 'Pipe the list of your commands to `cmd-stack init`'
