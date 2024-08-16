@@ -11,7 +11,11 @@ export def --env init [
     commands?: list
 ] {
     let $commands = if $commands == null {} else { $commands }
-        | default []
+
+    if $commands == null {
+        print 'Pipe the list of your commands to `cmd-stack init`'
+        return
+    }
 
     $env.cmd-stack = {
         index: -1
