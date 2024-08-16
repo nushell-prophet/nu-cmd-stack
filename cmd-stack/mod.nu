@@ -38,14 +38,14 @@ def --env update-index [
 }
 
 export def --env next [] {
-    command-to-line 1
+    cmd-cycle 1
 }
 
 export def --env prev [] {
-    command-to-line (-1)
+    cmd-cycle (-1)
 }
 
-def --env command-to-line [
+def --env cmd-cycle [
     $steps
 ] {
     let $index = $env.cmd-stack.index + $steps
