@@ -29,11 +29,8 @@ export def --env init [
 
 def --env update-index [
     steps?: int = 1
-    --set: int
 ] {
-    let index = if $set != null { $set } else {
-        ($env.cmd-stack?.index? | default (-1)) + $steps
-    }
+    let $index = $env.cmd-stack.index + $steps
 
     $env.cmd-stack.index = $index
 
