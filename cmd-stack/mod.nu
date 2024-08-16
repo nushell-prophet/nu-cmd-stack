@@ -66,7 +66,7 @@ def --env cmd-cycle [
 }
 
 def setup-keybindings [] {
-    # Use `commandline` edit here as keybindings can't be modified from custom command
+    # Use `commandline edit` here as keybindings can't be modified from custom command
     # Bug report: https://github.com/nushell/nushell/issues/13636
     let $closure = {
         # Add keybindings for `cmd-stack`
