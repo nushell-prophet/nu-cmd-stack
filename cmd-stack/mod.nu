@@ -17,9 +17,7 @@ export def --env init [
 def --env increment-index [
     steps?: int = 1
 ] {
-    let index = $env.cmd-stack?.index?
-        | default (-1)
-        | $in + $steps
+    let index = ($env.cmd-stack?.index? | default (-1)) + $steps
         | [0 $in]
         | math max
 
