@@ -38,27 +38,27 @@ def --env update-index [
 }
 
 export def --env next [] {
-    update-index 1
-    | command-to-line
+    command-to-line 1
 }
 
 export def --env prev [] {
-    update-index (-1)
-    | command-to-line
+    command-to-line (-1)
 }
 
-def --env command-to-line [] {
-    let $index = $in
+def --env command-to-line [
+    $steps
+] {
+    let $index = $env.cmd-stack.index + $steps
     let $stack_length = $env.cmd-stack.stack | length
 
     if $index > ($stack_length - 1) {
-        update-index (-1)
         ($"# There are only ($stack_length) commands in the stack, and you are at the very end of it.\n" +
         "# Use `cmd-stack prev` or the corresponding keybinding.")
     } else if $index < 0 {
-        update-index 1
         $"# You are at the beginning of the stack. Use `cmd-stack next` or the corresponding keybinding."
     } else {
+        update-index $steps
+
         $env.cmd-stack.stack
         | get $index
     }
