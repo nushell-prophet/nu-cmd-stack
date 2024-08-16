@@ -10,11 +10,11 @@ export def --env init [
     }
 
     if 'cmd-stack-next' not-in $env.config.keybindings.name {
-        add-keybindings
+        setup-keybindings
     }
 }
 
-def --env increment-index [
+def --env update-index [
     steps?: int = 1
 ] {
     let index = ($env.cmd-stack?.index? | default (-1)) + $steps
@@ -27,12 +27,12 @@ def --env increment-index [
 }
 
 export def --env next [] {
-    increment-index 1
+    update-index 1
     | command-to-line
 }
 
 export def --env prev [] {
-    increment-index (-1)
+    update-index (-1)
     | command-to-line
 }
 
@@ -45,7 +45,7 @@ def command-to-line [] {
     | commandline edit -r $in
 }
 
-def add-keybindings [] {
+def setup-keybindings [] {
     let $closure = {
         $env.config.keybindings = (
             $env.config.keybindings
