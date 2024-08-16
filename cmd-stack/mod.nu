@@ -1,4 +1,4 @@
-# show current state of cmd-stack
+# show the current state of cmd-stack
 export def main [] {
     $env.cmd-stack?
     | if $in == null {
@@ -28,10 +28,12 @@ export def --env init [
     }
 }
 
+# Get the next command from cmd-stack
 export def --env next [] {
     cmd-cycle 1
 }
 
+# Get the previous command from cmd-stack
 export def --env prev [] {
     cmd-cycle (-1)
 }
