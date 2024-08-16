@@ -1,3 +1,7 @@
+# run this demo using
+# > use `cmd-stack`
+# > open demo.nu | split row "\n\n" | skip | cmd-stack init
+
 # Let's set the `best_shell` variable to some correct value
 let best_shell = 'Nushell'
 
