@@ -14,15 +14,12 @@ export def --env init [
     }
 }
 
-export def --env increment-index [
+def --env increment-index [
     steps?: int = 1
-    --reset
 ] {
-    let index = if $reset { 0 } else {
-            $env.cmd-stack?.index?
-            | default (-1)
-            | $in + $steps
-        }
+    let index = $env.cmd-stack?.index?
+        | default (-1)
+        | $in + $steps
         | [0 $in]
         | math max
 
