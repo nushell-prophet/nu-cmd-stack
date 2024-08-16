@@ -1,4 +1,4 @@
-# show the current state of cmd-stack
+# Show current state of cmd-stack
 export def main [] {
     $env.cmd-stack?
     | if $in == null {
@@ -6,7 +6,7 @@ export def main [] {
     } else {}
 }
 
-# initialize cmd-stack
+# Initialize cmd-stack
 export def --env init [
     commands?: list
 ] {
@@ -28,12 +28,12 @@ export def --env init [
     }
 }
 
-# Get the next command from cmd-stack
+# Get next command from cmd-stack
 export def --env next [] {
     cmd-cycle 1
 }
 
-# Get the previous command from cmd-stack
+# Get previous command from cmd-stack
 export def --env prev [] {
     cmd-cycle (-1)
 }
@@ -60,10 +60,10 @@ def --env cmd-cycle [
 }
 
 def setup-keybindings [] {
-    # I use commandline edit here as I can't modify keybindings from custom command
-    # bugreport: https://github.com/nushell/nushell/issues/13636
+    # Use `commandline` edit here as keybindings can't be modified from custom command
+    # Bug report: https://github.com/nushell/nushell/issues/13636
     let $closure = {
-        # here we add keybindings for `cmd-stack`
+        # Add keybindings for `cmd-stack`
         $env.config.keybindings ++= [
             {
                 name: cmd-stack-next
