@@ -46,12 +46,21 @@ export def --env prev [] {
     | command-to-line
 }
 
-def command-to-line [] {
+def --env command-to-line [] {
     let $index = $in
+    let $stack_length = $env.cmd-stack.stack | length
 
-    $env.cmd-stack?.stack?
-    | get -i $index
-    | default $'# There are no commands left. The poistion of index is ($index)'
+    if $index > ($stack_length - 1) {
+        update-index (-1)
+        ($"# There are no more commands in the stack. The length of stack is: ($stack_length)")
+    } else if $index < 0 {
+        $env.cmd-stack.stack
+        | get -i (update-index --set 0)
+        | $"# This is the first command in the stack:\n($in)"
+    } else {
+        $env.cmd-stack.stack
+        | get $index
+    }
     | commandline edit -r $in
 }
 
