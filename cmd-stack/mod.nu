@@ -1,3 +1,11 @@
+# show current state of cmd-stack
+export def main [] {
+    $env.cmd-stack?
+    | if $in == null {
+        print 'cmd-stack is empty. Use `cmd-stack init`'
+    } else {}
+}
+
 export def --env init [
     commands?: list
 ] {
@@ -46,6 +54,8 @@ def command-to-line [] {
 }
 
 def setup-keybindings [] {
+    # I use commandline edit here as I can't modify keybindings from custom command
+    # bugreport: https://github.com/nushell/nushell/issues/13636
     let $closure = {
         $env.config.keybindings = (
             $env.config.keybindings
