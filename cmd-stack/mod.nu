@@ -55,9 +55,8 @@ def --env command-to-line [] {
         ($"# There are only ($stack_length) commands in the stack, and you are at the very end of it.\n" +
         "# Use `cmd-stack prev` or the corresponding keybinding.")
     } else if $index < 0 {
-        $env.cmd-stack.stack
-        | get -i (update-index --set 0)
-        | $"# This is the first command in the stack:\n($in)"
+        update-index 1
+        $"# You are at the beginning of the stack. Use `cmd-stack next` or the corresponding keybinding."
     } else {
         $env.cmd-stack.stack
         | get $index
