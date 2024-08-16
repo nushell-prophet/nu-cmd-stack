@@ -24,10 +24,11 @@ export def --env init [
 
 def --env update-index [
     steps?: int = 1
+    --set: int
 ] {
-    let index = ($env.cmd-stack?.index? | default (-1)) + $steps
-        | [0 $in]
-        | math max
+    let index = if $set != null { $set } else {
+        ($env.cmd-stack?.index? | default (-1)) + $steps
+    }
 
     $env.cmd-stack.index = $index
 
