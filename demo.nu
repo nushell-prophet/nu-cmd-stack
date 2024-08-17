@@ -6,7 +6,7 @@
 let best_shell = 'Nushell'
 
 # Let's add some beauty
-let $some_beauty = $'>($best_shell)' |  ansi gradient --fgstart '0x3719bd' --fgend '0xa9be52'
+let $some_beauty = $'>($best_shell)' | ansi gradient --fgstart '0x3719bd' --fgend '0xa9be52'
 
 # Let's check how it now looks like
 print $some_beauty
