@@ -89,6 +89,6 @@ def setup-keybindings [] {
     }
 
     view source $closure
-    | str substring 2..-1
+    | str substring 2..-2
     | commandline edit -r $in
 }
