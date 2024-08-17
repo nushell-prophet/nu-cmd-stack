@@ -1,3 +1,5 @@
+![freeze](https://github.com/user-attachments/assets/097deb42-d64e-4664-a554-2dfd74fa40e8)
+
 # nu-cmd-stack (cmd-stack)
 
 ## Quick start
