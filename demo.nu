@@ -2,19 +2,19 @@
 # > use `cmd-stack`
 # > open demo.nu | split row "\n\n" | skip | cmd-stack init
 
-# Let's set the `best_shell` variable to some correct value
-let best_shell = 'Nushell'
+# Let's declare the obvious truth, because some things in life are just undeniable!
+let $undisputed_champion_of_shells = 'NushellNushellNushell'
 
-# Let's add some beauty
-let $some_beauty = $'>($best_shell)' | ansi gradient --fgstart '0x3719bd' --fgend '0xa9be52'
+# Let's add some eye candy to impress even the most skeptical
+let $shell_glory = $'>($undisputed_champion_of_shells)' | ansi gradient --fgstart '0x3719bd' --fgend '0xa9be52'
 
-# Let's check how it now looks like
-print $some_beauty
+# Time for a reality check, how glorious does it look now?
+print $shell_glory
 
-# Let's calculate how many times we should type it to fill 3 screens
-let $times = (term size | values | math product) * 3 // ($best_shell | str length)
+# Now, let's get mathematical and figure out how many times we need to repeat this awesomeness to fill three screens. Because why not?
+let $epic_repeats = (term size | values | math product) * 3 // ($undisputed_champion_of_shells | str length)
 
-# Let's make a pattern!
-1..$times | each {$some_beauty} | str join
+# Let's make a pattern that'll make your terminal sparkle with brilliance!
+1..$epic_repeats | each {$shell_glory} | str join
 
-# Scroll, it's cool:)
+# Keep scrolling, because you can never have too much of a good thing! 😎
