@@ -4,11 +4,12 @@
 
 # Let's declare the obvious truth, because some things in life are just undeniable!
 let $undisputed_champion_of_shells = 'Nushell'
+    | '>' + $in
+    | $in + $in
 
 # Let's add some eye candy to impress even the most skeptical
-let $shell_glory = $'($undisputed_champion_of_shells)'
-    | ansi gradient --fgstart '0x6EF915' --fgend '0xC560DB'
-    | (ansi blue) + '>>>>' + $in
+let $shell_glory = $undisputed_champion_of_shells
+    | ansi gradient --fgstart '0xA311DF' --fgend '0xBAFA77'
 
 # Time for a reality check, how glorious does it look now?
 print $shell_glory
