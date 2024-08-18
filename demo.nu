@@ -3,9 +3,7 @@
 # > open demo.nu | split row "\n\n" | skip | cmd-stack init
 
 # Let's declare the obvious truth, because some things in life are just undeniable!
-let $undisputed_champion_of_shells = 'Nushell'
-    | '>' + $in
-    | $in + $in
+let $undisputed_champion_of_shells = 'Nushell' | '>' + $in | $in + $in
 
 # Let's add some eye candy to impress even the most skeptical
 let $shell_glory = $undisputed_champion_of_shells
