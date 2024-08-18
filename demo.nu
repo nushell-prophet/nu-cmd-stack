@@ -3,10 +3,12 @@
 # > open demo.nu | split row "\n\n" | skip | cmd-stack init
 
 # Let's declare the obvious truth, because some things in life are just undeniable!
-let $undisputed_champion_of_shells = 'NushellNushellNushell'
+let $undisputed_champion_of_shells = 'Nushell'
 
 # Let's add some eye candy to impress even the most skeptical
-let $shell_glory = $'>($undisputed_champion_of_shells)' | ansi gradient --fgstart '0x3719bd' --fgend '0xa9be52'
+let $shell_glory = $'($undisputed_champion_of_shells)'
+    | ansi gradient --fgstart '0x6EF915' --fgend '0xC560DB'
+    | (ansi blue) + '>>>>' + $in
 
 # Time for a reality check, how glorious does it look now?
 print $shell_glory
