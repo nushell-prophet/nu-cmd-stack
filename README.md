@@ -7,7 +7,11 @@
 > use cmd-stack
 ```
 
+## Demo
+
 https://github.com/user-attachments/assets/862f2eb7-0635-429a-99c4-d3f5ec8e8a7d
+
+[(high res youtube)](https://youtu.be/wBMm1bFlbaU)
 
 ## Examples
 
