@@ -16,7 +16,8 @@ print $blazing_glory
 
 # But how much of this beauty is enough? Enough to fill 3 WHOLE screens, that's how much!
 # (Although some might argue that's never enough...)
-let $searing_repeats = (term size | values | math product) // ($blazing_glory | ansi strip | str length --grapheme-clusters)
+let $screens = 3
+let $searing_repeats = (term size | $in.columns * $in.rows) * $screens // ($blazing_glory | ansi strip | str length --grapheme-clusters)
 
 # Now, let's unleash the glorious Nushell spam!
 # Warning: May cause terminal overload and feelings of pure joy.
