@@ -7,9 +7,7 @@
 > use cmd-stack
 ```
 
-
-https://github.com/user-attachments/assets/71d66ec2-817e-4794-94d4-b82e104a5244
-
+https://github.com/user-attachments/assets/862f2eb7-0635-429a-99c4-d3f5ec8e8a7d
 
 ## Examples
 
