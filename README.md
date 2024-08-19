@@ -7,6 +7,10 @@
 > use cmd-stack
 ```
 
+
+https://github.com/user-attachments/assets/71d66ec2-817e-4794-94d4-b82e104a5244
+
+
 ## Examples
 
 ```nushell no-run
