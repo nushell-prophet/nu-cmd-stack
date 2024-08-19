@@ -1,12 +1,13 @@
+# Because who needs boring demos, anyway?
 # run this demo using
 # > use `cmd-stack`
 # > open demo.nu | split row "\n\n" | skip | cmd-stack init
 
-# Let’s drop some hard truths, because the hottest shell on the block deserves it!
-let $flame_of_the_terminal = 'Nushell'
+# First things first, let's grab the best shell
+let $best_shell = 'Nushell'
 
 # Time to turn up the heat and make even the skeptics sweat!
-let $blazing_glory = $flame_of_the_terminal
+let $blazing_glory = $best_shell
     | '>' + $in + '>' + $in
     | ansi gradient --fgstart '0xF10347' --fgend '0x4BD1FE'
 
