@@ -15,7 +15,7 @@ let $shell_glory = $undisputed_champion_of_shells
 print $shell_glory
 
 # Now, let's get mathematical and figure out how many times we need to repeat this awesomeness to fill three screens. Because why not?
-let $epic_repeats = (term size | values | math product) * 3 // ($shell_glory | ansi strip | str length)
+let $epic_repeats = (term size | values | math product) // ($shell_glory | ansi strip | str length)
 
 # Let's make a pattern that'll make your terminal sparkle with brilliance!
 1..$epic_repeats | each {$shell_glory} | str join
