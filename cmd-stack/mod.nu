@@ -74,14 +74,12 @@ def setup-keybindings [] {
         # Add keybindings for `cmd-stack`
         $env.config.keybindings ++= [
             {
-                name: cmd-stack-next
                 modifier: control_alt
                 keycode: char_k
                 mode: [emacs, vi_normal, vi_insert]
                 event: { send: executehostcommand cmd: 'cmd-stack next' }
             }
             {
-                name: cmd-stack-prev
                 modifier: control_alt
                 keycode: char_j
                 mode: [emacs, vi_normal, vi_insert]
