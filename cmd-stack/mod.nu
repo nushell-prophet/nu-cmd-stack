@@ -29,9 +29,12 @@ export def --env init [
         stack: $commands
     }
 
-    if 'cmd-stack-next' not-in $env.config.keybindings.name {
-        setup-keybindings
-    }
+    $env.config.keybindings
+    | get -i event.cmd
+    | compact
+    | where $it =~ 'cmd-stack'
+    | is-empty
+    | if $in { setup-keybindings }
 }
 
 # Get next command from cmd-stack
@@ -72,14 +75,12 @@ def setup-keybindings [] {
         # Add keybindings for `cmd-stack`
         $env.config.keybindings ++= [
             {
-                name: cmd-stack-next
                 modifier: control_alt
                 keycode: char_k
                 mode: [emacs, vi_normal, vi_insert]
                 event: { send: executehostcommand cmd: 'cmd-stack next' }
             }
             {
-                name: cmd-stack-prev
                 modifier: control_alt
                 keycode: char_j
                 mode: [emacs, vi_normal, vi_insert]
