@@ -29,9 +29,11 @@ export def --env init [
         stack: $commands
     }
 
-    if 'cmd-stack-next' not-in $env.config.keybindings.name {
-        setup-keybindings
-    }
+    $env.config.keybindings
+    | where event.cmd? != null
+    | where event.cmd =~ 'cmd-stack'
+    | is-empty
+    | if $in { setup-keybindings }
 }
 
 # Get next command from cmd-stack
