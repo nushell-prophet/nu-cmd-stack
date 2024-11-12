@@ -30,8 +30,9 @@ export def --env init [
     }
 
     $env.config.keybindings
-    | where event.cmd? != null
-    | where event.cmd =~ 'cmd-stack'
+    | get -i event.cmd
+    | compact
+    | where $it =~ 'cmd-stack'
     | is-empty
     | if $in { setup-keybindings }
 }
