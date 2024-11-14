@@ -68,10 +68,7 @@ def --env cmd-cycle [
     | commandline edit -r $in
 }
 
-def setup-keybindings [] {
-    # Use `commandline edit` here as keybindings can't be modified from custom command
-    # Bug report: https://github.com/nushell/nushell/issues/13636
-    let $closure = {
+def --env setup-keybindings [] {
         # Add keybindings for `cmd-stack`
         $env.config.keybindings ++= [
             {
@@ -87,9 +84,4 @@ def setup-keybindings [] {
                 event: { send: executehostcommand cmd: 'cmd-stack prev' }
             }
         ]
-    }
-
-    view source $closure
-    | str substring 2..-2
-    | commandline edit -r $in
 }
