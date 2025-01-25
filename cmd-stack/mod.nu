@@ -35,6 +35,8 @@ export def --env init [
     | where $it =~ 'cmd-stack'
     | is-empty
     | if $in { setup-keybindings }
+
+    $'(stack-length) items added to cmd-stack' | print
 }
 
 # Get next command from cmd-stack
@@ -47,6 +49,10 @@ export def --env prev [] {
     cmd-cycle (-1)
 }
 
+def stack-length [] {
+    $env.cmd-stack.stack | length
+}
+
 def --env cmd-cycle [
     $steps
 ] {
@@ -55,7 +61,7 @@ def --env cmd-cycle [
         return
     }
     let $index = $env.cmd-stack.index + $steps
-    let $stack_length = $env.cmd-stack.stack | length
+    let $stack_length = stack-length
 
     if $index > ($stack_length - 1) {
         [ $" # There are only ($stack_length) commands in the stack,"
