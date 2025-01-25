@@ -36,7 +36,10 @@ export def --env init [
     | is-empty
     | if $in { setup-keybindings }
 
-    $'(stack-length) items added to cmd-stack' | print
+    [ $'(stack-length) items added to cmd-stack.'
+    'use `ctrl+alt+j/k` for scrolling through them.' ]
+    | to text
+    | print
 }
 
 # Get next command from cmd-stack
