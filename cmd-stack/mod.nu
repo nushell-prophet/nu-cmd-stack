@@ -100,3 +100,25 @@ def --env setup-keybindings [] {
             }
         ]
 }
+
+alias core_hist = history
+
+export def --env 'history' [
+    --last-sessions: int = 10
+] {
+    open $nu.history-path
+    | query db --params [$last_sessions] "
+        with sessions as (select distinct(session_id) from history order by id desc limit ?)
+        select command_line command, session_id
+        from history
+        where session_id in sessions
+    "
+    | group-by session_id
+    | values
+    | each {
+        get command
+        | to nuon --indent 2
+        | $'($in) | cmd-stack init'
+    }
+    | init
+}
