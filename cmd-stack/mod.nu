@@ -58,8 +58,10 @@ def --env cmd-cycle [
     let $stack_length = $env.cmd-stack.stack | length
 
     if $index > ($stack_length - 1) {
-        ($"# There are only ($stack_length) commands in the stack, and you are at the very end of it.\n" +
-        "# Use `cmd-stack prev` or the `ctrl+alt+j` keybinding.")
+        [ $" # There are only ($stack_length) commands in the stack,"
+        "# and you are at the very end of it."
+        "# Use `cmd-stack prev` or the `ctrl+alt+j` keybinding." ]
+        | to text
     } else if $index < 0 {
         $env.cmd-stack.index = -1
         $"# You are at the beginning of the stack. Use `cmd-stack next` or or the `ctrl+alt+k` keybinding."
