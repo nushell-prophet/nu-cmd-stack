@@ -50,6 +50,10 @@ export def --env prev [] {
 def --env cmd-cycle [
     $steps
 ] {
+    if $env.cmd-stack?.index? == null {
+        commandline edit -r "# cmd-stack is empty. Initialize it using `cmd-stack init`"
+        return
+    }
     let $index = $env.cmd-stack.index + $steps
     let $stack_length = $env.cmd-stack.stack | length
 
