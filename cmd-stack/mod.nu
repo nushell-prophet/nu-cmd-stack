@@ -29,12 +29,14 @@ export def --env init [
         stack: $commands
     }
 
-    $env.config.keybindings
-    | get -i event.cmd
-    | compact
-    | where $it =~ 'cmd-stack'
-    | is-empty
-    | if $in { setup-keybindings }
+    # it breaks existing keybindings 0.101, so it needs to be placed into `config.nu`
+
+    # $env.config.keybindings
+    # | get -i event.cmd
+    # | compact
+    # | where $it =~ 'cmd-stack'
+    # | is-empty
+    # | if $in { setup-keybindings }
 
     [ $'(stack-length) items added to cmd-stack.'
     'use `ctrl+alt+j/k` for scrolling through them.' ]
