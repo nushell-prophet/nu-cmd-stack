@@ -29,14 +29,12 @@ export def --env init [
         stack: $commands
     }
 
-    # it breaks existing keybindings 0.101, so it needs to be placed into `config.nu`
-
-    # $env.config.keybindings
-    # | get -i event.cmd
-    # | compact
-    # | where $it =~ 'cmd-stack'
-    # | is-empty
-    # | if $in { setup-keybindings }
+    $env.config.keybindings
+    | get -i event.cmd
+    | compact
+    | where $it =~ 'cmd-stack'
+    | is-empty
+    | if $in { setup-keybindings }
 
     [ $'(stack-length) items added to cmd-stack.'
     'use `ctrl+alt+j/k` for scrolling through them.' ]
@@ -87,6 +85,12 @@ def --env cmd-cycle [
 
 def --env setup-keybindings [] {
         # Add keybindings for `cmd-stack`
+
+    [
+    "setting keybindings from inside of a module breaks existing keybindings in 0.101,"
+    "place the keybindings into your `config.nu`"
+
+    r#'
         $env.config.keybindings ++= [
             {
                 modifier: control_alt
@@ -101,6 +105,8 @@ def --env setup-keybindings [] {
                 event: { send: executehostcommand cmd: 'cmd-stack prev' }
             }
         ]
+    '#
+    ] | str join | str replace -rm '^\t\t' ''
 }
 
 alias core_hist = history
