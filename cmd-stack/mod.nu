@@ -85,6 +85,11 @@ def --env cmd-cycle [
 
 def --env setup-keybindings [] {
         # Add keybindings for `cmd-stack`
+
+    [ "setting keybindings from inside of a module breaks existing keybindings in 0.101, "
+    "place the keybindings below into your `config.nu`."
+
+    r#'
         $env.config.keybindings ++= [
             {
                 modifier: control_alt
@@ -99,6 +104,11 @@ def --env setup-keybindings [] {
                 event: { send: executehostcommand cmd: 'cmd-stack prev' }
             }
         ]
+    '#
+    ]
+    | str join
+    | str replace -rm '^\t\t' ''
+    | print
 }
 
 alias core_hist = history
