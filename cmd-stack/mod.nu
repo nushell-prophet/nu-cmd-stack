@@ -104,8 +104,7 @@ def --env setup-keybindings [] {
                 event: { send: executehostcommand cmd: 'cmd-stack prev' }
             }
         ]
-    '#
-    ]
+    '# ]
     | str join
     | str replace -rm '^\t\t' ''
     | print
