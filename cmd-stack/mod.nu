@@ -87,8 +87,8 @@ def --env setup-keybindings [] {
         # Add keybindings for `cmd-stack`
 
     [
-    "setting keybindings from inside of a module breaks existing keybindings in 0.101,"
-    "place the keybindings into your `config.nu`"
+    "setting keybindings from inside of a module breaks existing keybindings in 0.101, "
+    "place the keybindings below into your `config.nu`."
 
     r#'
         $env.config.keybindings ++= [
@@ -106,7 +106,10 @@ def --env setup-keybindings [] {
             }
         ]
     '#
-    ] | str join | str replace -rm '^\t\t' ''
+    ]
+    | str join
+    | str replace -rm '^\t\t' ''
+    | print
 }
 
 alias core_hist = history
