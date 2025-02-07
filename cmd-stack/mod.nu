@@ -69,11 +69,11 @@ def --env cmd-cycle [
     if $index > ($stack_length - 1) {
         [ $" # There are only ($stack_length) commands in the stack,"
         "# and you are at the very end of it."
-        "# Use `cmd-stack prev` or the `ctrl+alt+j` keybinding." ]
+        "# Use the `ctrl+alt+j` keybinding or the command `cmd-stack prev`." ]
         | to text
     } else if $index < 0 {
         $env.cmd-stack.index = -1
-        $"# You are at the beginning of the stack. Use `cmd-stack next` or or the `ctrl+alt+k` keybinding."
+        $"# You are at the beginning of the stack. Use the `ctrl+alt+k` keybinding or `cmd-stack next`."
     } else {
         $env.cmd-stack.index = $index
 
@@ -106,7 +106,7 @@ def --env setup-keybindings [] {
         ]
     '# ]
     | str join
-    | str replace -rm '^\t\t' ''
+    | str replace -rm '^\t\t' '' # for formatting code nicely
     | print
 }
 
