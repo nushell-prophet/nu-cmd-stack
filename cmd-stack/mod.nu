@@ -9,7 +9,7 @@ export def main [] {
     $env.cmd-stack?
     | if $in == null {
         print 'cmd-stack is empty. Use `cmd-stack init`'
-    } else {}
+    } else { }
 }
 
 # Initialize cmd-stack
@@ -17,7 +17,7 @@ export def --env init [
     commands?: list
 ] {
     let $commands = $in
-        | if $commands == null {} else { $commands }
+    | if $commands == null { } else { $commands }
 
     if $commands == null {
         print 'Pipe the list of your commands to `cmd-stack init`'
@@ -36,8 +36,10 @@ export def --env init [
     | is-empty
     | if $in { setup-keybindings }
 
-    [ $'(stack-length) items added to cmd-stack.'
-    'use `ctrl+alt+j/k` for scrolling through them.' ]
+    [
+        $'(stack-length) items added to cmd-stack.'
+        'use `ctrl+alt+j/k` for scrolling through them.'
+    ]
     | to text
     | print
 }
@@ -67,9 +69,11 @@ def --env cmd-cycle [
     let $stack_length = stack-length
 
     if $index > ($stack_length - 1) {
-        [ $" # There are only ($stack_length) commands in the stack,"
-        "# and you are at the very end of it."
-        "# Use the `ctrl+alt+j` keybinding or the command `cmd-stack prev`." ]
+        [
+            $" # There are only ($stack_length) commands in the stack,"
+            "# and you are at the very end of it."
+            "# Use the `ctrl+alt+j` keybinding or the command `cmd-stack prev`."
+        ]
         | to text
     } else if $index < 0 {
         $env.cmd-stack.index = -1
@@ -84,21 +88,21 @@ def --env cmd-cycle [
 }
 
 def --env setup-keybindings [] {
-        # Add keybindings for `cmd-stack`
-        $env.config.keybindings ++= [
-            {
-                modifier: control_alt
-                keycode: char_k
-                mode: [emacs, vi_normal, vi_insert]
-                event: { send: executehostcommand cmd: 'cmd-stack next' }
-            }
-            {
-                modifier: control_alt
-                keycode: char_j
-                mode: [emacs, vi_normal, vi_insert]
-                event: { send: executehostcommand cmd: 'cmd-stack prev' }
-            }
-        ]
+    # Add keybindings for `cmd-stack`
+    $env.config.keybindings ++= [
+        {
+            modifier: control_alt
+            keycode: char_k
+            mode: [emacs vi_normal vi_insert]
+            event: {send: executehostcommand cmd: 'cmd-stack next'}
+        }
+        {
+            modifier: control_alt
+            keycode: char_j
+            mode: [emacs vi_normal vi_insert]
+            event: {send: executehostcommand cmd: 'cmd-stack prev'}
+        }
+    ]
 }
 
 alias core_hist = history
