@@ -8,8 +8,8 @@ let $best_shell = 'Nushell'
 
 # But a plain name is a bit, well, plain. Let's add some pizazz!
 let $blazing_glory = $best_shell
-    | '>' + $in + '>' + $in
-    | ansi gradient --fgstart '0xF10347' --fgend '0x4BD1FE'
+| '>' + $in + '>' + $in
+| ansi gradient --fgstart '0xF10347' --fgend '0x4BD1FE'
 
 # Time to admire our masterpiece!
 print $blazing_glory
@@ -21,4 +21,4 @@ let $searing_repeats = (term size | $in.columns * $in.rows) * $screens // ($blaz
 
 # Now, let's unleash the glorious Nushell spam!
 # Warning: May cause terminal overload and feelings of pure joy.
-1..$searing_repeats | each {$blazing_glory} | str join
+1..$searing_repeats | each { $blazing_glory } | str join
