@@ -30,6 +30,7 @@ export def --env init [
     }
 
     $env.config.keybindings
+    | default null event.cmd
     | get -i event.cmd
     | compact
     | where $it =~ 'cmd-stack'
