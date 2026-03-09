@@ -61,6 +61,52 @@ def --env cmd-push [cmd: string] {
     commandline edit -r ''
 }
 
+# Check if cmd-stack keybindings conflict with existing ones
+export def check-keybindings [] {
+    let ours = [
+        [modifier keycode cmd];
+        [control char_s 'cmd-stack push']
+        [control_alt char_k 'cmd-stack next']
+        [control_alt char_j 'cmd-stack prev']
+    ]
+
+    let conflicts = $ours | each {|binding|
+        $env.config.keybindings
+        | where {|kb|
+            $kb.keycode == $binding.keycode and (
+                $kb.modifier == $binding.modifier or
+                # account for modifier aliases (e.g. control_alt vs alt_control)
+                $kb.modifier == ($binding.modifier | split row '_' | reverse | str join '_')
+            )
+        }
+        | where {|kb|
+            ($kb.event.cmd? | default '') !~ 'cmd-stack'
+        }
+        | each {|kb|
+            {
+                key: $'($binding.modifier)+($binding.keycode)'
+                cmd_stack_cmd: $binding.cmd
+                conflict_name: ($kb.name? | default '(unnamed)')
+                conflict_event: ($kb.event | to nuon)
+            }
+        }
+    }
+    | flatten
+
+    if ($conflicts | is-empty) {
+        print 'No conflicts found in $env.config.keybindings.'
+    } else {
+        print 'Conflicts found:'
+        print ($conflicts | table)
+    }
+
+    # Warn about known terminal-level issues
+    print ''
+    print '# Note: ctrl+s may be intercepted by terminal XOFF (flow control).'
+    print '# This cannot be detected from nushell. Fix with: stty -ixon'
+    print '# Reedline built-in defaults also cannot be checked here.'
+}
+
 # Get next command from cmd-stack
 export def --env next [] {
     cmd-cycle 1
