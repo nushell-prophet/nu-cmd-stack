@@ -45,6 +45,22 @@ export def --env init [
     | print
 }
 
+# Push a command to the end of cmd-stack
+export def --env push [cmd: string] {
+    cmd-push $cmd
+}
+
+def --env cmd-push [cmd: string] {
+    if ($cmd | str trim | is-empty) { return }
+
+    if $env.cmd-stack? == null {
+        $env.cmd-stack = {index: -1, stack: []}
+    }
+
+    $env.cmd-stack.stack = ($env.cmd-stack.stack | append $cmd)
+    commandline edit -r ''
+}
+
 # Get next command from cmd-stack
 export def --env next [] {
     cmd-cycle 1
@@ -102,6 +118,12 @@ def --env setup-keybindings [] {
             keycode: char_j
             mode: [emacs vi_normal vi_insert]
             event: {send: executehostcommand cmd: 'cmd-stack prev'}
+        }
+        {
+            modifier: control
+            keycode: char_s
+            mode: [emacs vi_normal vi_insert]
+            event: {send: executehostcommand cmd: 'cmd-stack push (commandline)'}
         }
     ]
 }
