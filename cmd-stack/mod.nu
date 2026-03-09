@@ -119,6 +119,11 @@ def --env setup-keybindings [] {
             mode: [emacs vi_normal vi_insert]
             event: {send: executehostcommand cmd: 'cmd-stack prev'}
         }
+        # ctrl+s to push — inspired by Claude Code's submit keybinding.
+        # Note: ctrl+s may conflict with terminal XOFF (flow control).
+        # If so, disable it with `stty -ixon` or use one of these alternatives:
+        # - ctrl+alt+p (p for push)
+        # - ctrl+alt+s (s for store/stack)
         {
             modifier: control
             keycode: char_s
