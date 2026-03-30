@@ -29,13 +29,7 @@ export def --env init [
         stack: $commands
     }
 
-    $env.config.keybindings
-    | default null event.cmd
-    | get -o event.cmd
-    | compact
-    | where $it =~ 'cmd-stack'
-    | is-empty
-    | if $in { setup-keybindings }
+    default-keybindings | apply-keybindings
 
     [
         $'(stack-length) items added to cmd-stack.'
@@ -61,50 +55,59 @@ def --env cmd-push [cmd: string] {
     commandline edit -r ''
 }
 
-# Check if cmd-stack keybindings conflict with existing ones
-export def check-keybindings [] {
-    let ours = [
-        [modifier keycode cmd];
-        [control char_s 'cmd-stack push']
-        [control_alt char_k 'cmd-stack next']
-        [control_alt char_j 'cmd-stack prev']
-    ]
+# Apply keybindings with conflict detection.
+# Pipe a list of keybinding records. Identical existing bindings are skipped.
+# Conflicts are reported — use --force to override them.
+export def --env apply-keybindings [
+    --force  # Override conflicting keybindings
+] {
+    let bindings = $in
+    let normalize_mod = {|m| $m | split row '_' | sort | str join '_' }
 
-    let conflicts = $ours | each {|binding|
-        $env.config.keybindings
-        | where {|kb|
-            $kb.keycode == $binding.keycode and (
-                $kb.modifier == $binding.modifier or
-                # account for modifier aliases (e.g. control_alt vs alt_control)
-                $kb.modifier == ($binding.modifier | split row '_' | reverse | str join '_')
-            )
+    let results = $bindings | each {|binding|
+        let norm_mod = do $normalize_mod $binding.modifier
+        let matches = $env.config.keybindings | where {|kb|
+            (do $normalize_mod $kb.modifier) == $norm_mod and $kb.keycode == $binding.keycode
         }
-        | where {|kb|
-            ($kb.event.cmd? | default '') !~ 'cmd-stack'
-        }
-        | each {|kb|
-            {
-                key: $'($binding.modifier)+($binding.keycode)'
-                cmd_stack_cmd: $binding.cmd
-                conflict_name: ($kb.name? | default '(unnamed)')
-                conflict_event: ($kb.event | to nuon)
+
+        if ($matches | is-empty) {
+            {status: new, binding: $binding, conflict: null}
+        } else {
+            let identical = $matches | where {|kb| $kb.event == $binding.event }
+            if ($identical | is-not-empty) {
+                {status: identical, binding: $binding, conflict: null}
+            } else {
+                {status: conflict, binding: $binding, conflict: ($matches | first)}
             }
         }
     }
-    | flatten
 
-    if ($conflicts | is-empty) {
-        print 'No conflicts found in $env.config.keybindings.'
-    } else {
-        print 'Conflicts found:'
-        print ($conflicts | table)
+    let to_add = $results | where status in [new, conflict]
+    let identical = $results | where status == identical
+    let conflicts = $results | where status == conflict
+
+    if ($identical | is-not-empty) {
+        let n = $identical | length
+        print $'($n) already set — skipped.'
     }
 
-    # Warn about known terminal-level issues
-    print ''
-    print '# Note: ctrl+s may be intercepted by terminal XOFF (flow control).'
-    print '# This cannot be detected from nushell. Fix with: stty -ixon'
-    print '# Reedline built-in defaults also cannot be checked here.'
+    if ($conflicts | is-not-empty) and (not $force) {
+        let n = $conflicts | length
+        print $'($n) conflicts found — nothing applied:'
+        $conflicts | each {|c|
+            let kb = $c.conflict
+            let name = $kb.name? | default 'unnamed'
+            print $'  ($c.binding.modifier)+($c.binding.keycode) is bound to "($name)"'
+        }
+        print 'Use --force to override.'
+        return
+    }
+
+    if ($to_add | is-not-empty) {
+        $env.config.keybindings ++= ($to_add | get binding)
+        let n = $to_add | length
+        print $'($n) keybindings applied.'
+    }
 }
 
 # Get next command from cmd-stack
@@ -150,9 +153,9 @@ def --env cmd-cycle [
     | commandline edit -r $in
 }
 
-def --env setup-keybindings [] {
-    # Add keybindings for `cmd-stack`
-    $env.config.keybindings ++= [
+# Default keybindings for cmd-stack
+def default-keybindings [] {
+    [
         {
             modifier: control_alt
             keycode: char_k
