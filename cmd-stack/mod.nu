@@ -15,6 +15,7 @@ export def main [] {
 # Initialize cmd-stack
 export def --env init [
     commands?: list
+    --quiet # don't print help instructions
     --force-keybindings # force keybindings add
 ] {
     let $commands = $in
@@ -25,13 +26,15 @@ export def --env init [
         stack: $commands
     }
 
-    default-keybindings | apply-keybindings --force=$force_keybindings
+    default-keybindings | apply-keybindings --force=$force_keybindings --quiet=$quiet
 
-    if $commands == null {
-        print 'Pipe the list of your commands to `cmd-stack init`'
-    } else {
-        print $'(stack-length) items added to cmd-stack.'
-        print 'use `ctrl+alt+j/k` for scrolling through them.'
+    if not $quiet { 
+        if $commands == null {
+            print 'Pipe the list of your commands to `cmd-stack init`'
+        } else {
+            print $'(stack-length) items added to cmd-stack.'
+            print 'use `ctrl+alt+j/k` for scrolling through them.'
+        }
     }
 }
 
@@ -56,6 +59,7 @@ def --env cmd-push [cmd: string] {
 # Conflicts are reported — use --force to override them.
 def --env apply-keybindings [
     --force  # Override conflicting keybindings
+    --quiet  # Don't print information message 
 ] {
     let bindings = $in
     let normalize_mod = {|m| $m | split row '_' | sort | str join '_' }
@@ -102,7 +106,7 @@ def --env apply-keybindings [
     if ($to_add | is-not-empty) {
         $env.config.keybindings ++= ($to_add | get binding)
         let n = $to_add | length
-        print $'($n) keybindings applied.'
+        if not $quiet { print $'($n) keybindings applied.' }
     }
 }
 
@@ -196,7 +200,7 @@ export def --env 'history' [
     | each {
         get command
         | to nuon --indent 2
-        | $'($in) | cmd-stack init'
+        | $'($in) | cmd-stack init --quiet'
     }
     | init
 }
