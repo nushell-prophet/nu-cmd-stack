@@ -58,7 +58,7 @@ def --env cmd-push [cmd: string] {
 # Apply keybindings with conflict detection.
 # Pipe a list of keybinding records. Identical existing bindings are skipped.
 # Conflicts are reported — use --force to override them.
-export def --env apply-keybindings [
+def --env apply-keybindings [
     --force  # Override conflicting keybindings
 ] {
     let bindings = $in
