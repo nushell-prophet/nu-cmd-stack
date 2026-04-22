@@ -180,6 +180,7 @@ def default-keybindings [] {
 
 alias core_hist = history
 
+# add commands from n-last-history sessesion into cmd-stack with template `[session commands] | cmd-stack init` for interactive pick
 export def --env 'history' [
     --last-sessions: int = 10
 ] {
