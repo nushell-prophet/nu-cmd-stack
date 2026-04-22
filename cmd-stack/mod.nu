@@ -15,6 +15,7 @@ export def main [] {
 # Initialize cmd-stack
 export def --env init [
     commands?: list
+    --force-keybindings # force keybindings add
 ] {
     let $commands = $in
     | if $commands == null { } else { $commands }
@@ -28,7 +29,7 @@ export def --env init [
         stack: $commands
     }
 
-    default-keybindings | apply-keybindings
+    default-keybindings | apply-keybindings --force=$force_keybindings
 
     [
         $'(stack-length) items added to cmd-stack.'
