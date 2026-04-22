@@ -21,7 +21,6 @@ export def --env init [
 
     if $commands == null {
         print 'Pipe the list of your commands to `cmd-stack init`'
-        return
     }
 
     $env.cmd-stack = {
