@@ -20,10 +20,6 @@ export def --env init [
     let $commands = $in
     | if $commands == null { } else { $commands }
 
-    if $commands == null {
-        print 'Pipe the list of your commands to `cmd-stack init`'
-    }
-
     $env.cmd-stack = {
         index: -1
         stack: $commands
@@ -31,12 +27,12 @@ export def --env init [
 
     default-keybindings | apply-keybindings --force=$force_keybindings
 
-    [
-        $'(stack-length) items added to cmd-stack.'
-        'use `ctrl+alt+j/k` for scrolling through them.'
-    ]
-    | to text
-    | print
+    if $commands == null {
+        print 'Pipe the list of your commands to `cmd-stack init`'
+    } else {
+        print $'(stack-length) items added to cmd-stack.'
+        print 'use `ctrl+alt+j/k` for scrolling through them.'
+    }
 }
 
 # Push a command to the end of cmd-stack
