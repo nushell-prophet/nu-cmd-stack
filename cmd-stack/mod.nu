@@ -19,7 +19,7 @@ export def --env init [
     --force-keybindings # force keybindings add
 ] {
     let $commands = $in
-    | if $commands == null { } else { $commands }
+        | if $commands == null { } else { $commands }
 
     $env.cmd-stack = {
         index: -1
@@ -47,7 +47,7 @@ def --env cmd-push [cmd: string] {
     if ($cmd | str trim | is-empty) { return }
 
     if $env.cmd-stack? == null {
-        $env.cmd-stack = {index: -1, stack: []}
+        $env.cmd-stack = {index: -1 stack: []}
     }
 
     $env.cmd-stack.stack = ($env.cmd-stack.stack | append $cmd)
@@ -65,24 +65,24 @@ def --env apply-keybindings [
     let normalize_mod = {|m| $m | split row '_' | sort | str join '_' }
 
     let results = $bindings | each {|binding|
-        let norm_mod = do $normalize_mod $binding.modifier
-        let matches = $env.config.keybindings | where {|kb|
-            (do $normalize_mod $kb.modifier) == $norm_mod and $kb.keycode == $binding.keycode
-        }
+            let norm_mod = do $normalize_mod $binding.modifier
+            let matches = $env.config.keybindings | where {|kb|
+                    (do $normalize_mod $kb.modifier) == $norm_mod and $kb.keycode == $binding.keycode
+                }
 
-        if ($matches | is-empty) {
-            {status: new, binding: $binding, conflict: null}
-        } else {
-            let identical = $matches | where {|kb| $kb.event == $binding.event }
-            if ($identical | is-not-empty) {
-                {status: identical, binding: $binding, conflict: null}
+            if ($matches | is-empty) {
+                {status: new binding: $binding conflict: null}
             } else {
-                {status: conflict, binding: $binding, conflict: ($matches | first)}
+                let identical = $matches | where {|kb| $kb.event == $binding.event }
+                if ($identical | is-not-empty) {
+                    {status: identical binding: $binding conflict: null}
+                } else {
+                    {status: conflict binding: $binding conflict: ($matches | first)}
+                }
             }
         }
-    }
 
-    let to_add = $results | where status in [new, conflict]
+    let to_add = $results | where status in [new conflict]
     let identical = $results | where status == identical
     let conflicts = $results | where status == conflict
 
