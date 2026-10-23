@@ -5,7 +5,8 @@
 # https://discord.com/channels/601130461678272522/615253963645911060/1270752014506397736
 
 # Show current state of cmd-stack
-export def main [] {
+@category history
+export def main []: nothing -> oneof<record, nothing> {
     $env.cmd-stack?
     | if $in == null {
         print 'cmd-stack is empty. Use `cmd-stack init`'
@@ -18,7 +19,7 @@ export def --env init [
     --quiet # don't print help instructions
     --force-keybindings # force keybindings add
 ] {
-    let $commands = $in
+    let commands = $in
         | if $commands == null { } else { $commands }
 
     $env.cmd-stack = {
@@ -51,7 +52,7 @@ def --env cmd-push [cmd: string] {
     }
 
     $env.cmd-stack.stack = ($env.cmd-stack.stack | append $cmd)
-    commandline edit -r ''
+    commandline edit --replace ''
 }
 
 # Apply keybindings with conflict detection.
@@ -73,7 +74,8 @@ def --env apply-keybindings [
             if ($matches | is-empty) {
                 {status: new binding: $binding conflict: null}
             } else {
-                let identical = $matches | where {|kb| $kb.event == $binding.event }
+                let identical = $matches | where event == $binding.event
+
                 if ($identical | is-not-empty) {
                     {status: identical binding: $binding conflict: null}
                 } else {
@@ -88,15 +90,18 @@ def --env apply-keybindings [
 
     if ($identical | is-not-empty) {
         let n = $identical | length
+
         print $'($n) already set — skipped.'
     }
 
     if ($conflicts | is-not-empty) and (not $force) {
         let n = $conflicts | length
+
         print $'($n) conflicts found — nothing applied:'
         $conflicts | each {|c|
             let kb = $c.conflict
             let name = $kb.name? | default 'unnamed'
+
             print $'  ($c.binding.modifier)+($c.binding.keycode) is bound to "($name)"'
         }
         print 'Use --force to override.'
@@ -106,6 +111,7 @@ def --env apply-keybindings [
     if ($to_add | is-not-empty) {
         $env.config.keybindings ++= ($to_add | get binding)
         let n = $to_add | length
+
         if not $quiet { print $'($n) keybindings applied.' }
     }
 }
@@ -120,19 +126,19 @@ export def --env prev [] {
     cmd-cycle (-1)
 }
 
-def stack-length [] {
+def stack-length []: nothing -> int {
     $env.cmd-stack.stack | length
 }
 
 def --env cmd-cycle [
-    $steps
-] {
+    steps: int
+]: nothing -> nothing {
     if $env.cmd-stack?.index? == null {
-        commandline edit -r "# cmd-stack is empty. Initialize it using `cmd-stack init`"
+        commandline edit --replace "# cmd-stack is empty. Initialize it using `cmd-stack init`"
         return
     }
-    let $index = $env.cmd-stack.index + $steps
-    let $stack_length = stack-length
+    let index = $env.cmd-stack.index + $steps
+    let stack_length = stack-length
 
     if $index > ($stack_length - 1) {
         [
@@ -150,11 +156,11 @@ def --env cmd-cycle [
         $env.cmd-stack.stack
         | get $index
     }
-    | commandline edit -r $in
+    | commandline edit --replace $in
 }
 
 # Default keybindings for cmd-stack
-def default-keybindings [] {
+def default-keybindings []: nothing -> list<record> {
     [
         {
             modifier: control_alt
@@ -181,8 +187,6 @@ def default-keybindings [] {
         }
     ]
 }
-
-alias core_hist = history
 
 # add commands from n-last-history sessesion into cmd-stack with template `[session commands] | cmd-stack init` for interactive pick
 export def --env 'history' [
