@@ -4,6 +4,11 @@
 # Thanks to @weirdan for the inspiration!
 # https://discord.com/channels/601130461678272522/615253963645911060/1270752014506397736
 
+# The folder of stack files that `cmd-stack load` completes from.
+# Why a fixed path, not `$nu.data-dir`: an agent writes there from its own
+# processes, and `$nu.data-dir` differs between Linux and macOS.
+const default_dir = '~/.local/share/nushell/cmd-stacks'
+
 # Show current state of cmd-stack
 @category history
 export def main []: nothing -> oneof<record, nothing> {
@@ -29,7 +34,7 @@ export def --env init [
 
     default-keybindings | apply-keybindings --force=$force_keybindings --quiet=$quiet
 
-    if not $quiet { 
+    if not $quiet {
         if $commands == null {
             print 'Pipe the list of your commands to `cmd-stack init`'
         } else {
@@ -39,20 +44,197 @@ export def --env init [
     }
 }
 
-# Push a command to the end of cmd-stack
-export def --env push [cmd: string] {
-    cmd-push $cmd
+# Load a stack file into cmd-stack
+#
+# A stack file is a Nushell script whose blocks, split by empty lines, are the
+# commands. A first block of only comments describes the stack: completion shows
+# it, and it is not loaded. An agent writes stack files into the stacks folder,
+# `$env.CMD_STACK_DIR` or `~/.local/share/nushell/cmd-stacks`, and each show of
+# their commands is reported for `cmd-stack runs`.
+@category history
+@example "load a demo script as a stack" { cmd-stack load demo.nu }
+export def --env load [
+    stack: string@"nu-complete cmd-stack stacks" # a name in the stacks folder, or a path to a file
+]: nothing -> nothing {
+    let file = stack-path $stack
+
+    $env.cmd-stack = {
+        index: -1
+        stack: (stack-commands $file)
+        source: $file
+    }
+
+    print $'(stack-length) items loaded from ($file).'
+    print 'use `ctrl+alt+k` for the first one.'
 }
 
-def --env cmd-push [cmd: string] {
-    if ($cmd | str trim | is-empty) { return }
+# Push commands to the end of cmd-stack
+@example "push a sequence" { ['ls' 'print done'] | cmd-stack push }
+export def --env push [
+    cmd?: string # the command; without it, the commands come from the pipeline
+]: [nothing -> nothing string -> nothing list<string> -> nothing] {
+    let commands = if $cmd != null { [$cmd] } else { [$in] | flatten | compact }
+        | where ($it | str trim | is-not-empty)
+
+    if ($commands | is-empty) { return }
 
     if $env.cmd-stack? == null {
         $env.cmd-stack = {index: -1 stack: []}
     }
 
-    $env.cmd-stack.stack = ($env.cmd-stack.stack | append $cmd)
+    $env.cmd-stack.stack = ($env.cmd-stack.stack | append $commands)
     commandline edit --replace ''
+}
+
+# The commands of a stack file that a shell showed, each joined with the history
+# row that ran after the show: whoever wrote the file reads the outcome here.
+# Of several shows in a row, the last one counts: the shell ran nothing between them.
+@category history
+export def runs [
+    stack: string@"nu-complete cmd-stack stacks" # a name in the stacks folder, or a path to a file
+    --history-db: path # the sqlite history of the shells; the one in the nushell config dir by default
+]: nothing -> table {
+    let file = stack-path $stack
+    let log = shown-log
+
+    if not ($log | path exists) { return [] }
+
+    let history = open ($history_db | default (history-db))
+
+    open --raw $log
+    | from json --objects
+    | reverse
+    | uniq-by nu_session history_id
+    | reverse
+    | where stack == $file
+    | each {|shown|
+        let run = $history
+            | query db 'select command_line, exit_status, duration_ms from history where session_id = ? and id > ? order by id limit 1' --params [$shown.nu_session ($shown.history_id | default 0)]
+            | get --optional 0
+
+        {
+            index: $shown.index
+            command: $shown.command
+            pane: $shown.pane
+            shown_at: $shown.at
+            ran: $run.command_line?
+            exit_status: $run.exit_status?
+            duration: ($run.duration_ms? | if $in == null { } else { into duration --unit ms })
+        }
+    }
+}
+
+def "nu-complete cmd-stack stacks" []: nothing -> record {
+    let dir = stacks-dir
+
+    if not ($dir | path exists) { return {completions: []} }
+
+    let completions = ls $dir
+        | where type == file and ($it.name | str ends-with '.nu')
+        | sort-by modified --reverse
+        | each {|f|
+            let blocks = stack-blocks $f.name
+            let about = $blocks
+                | first 1
+                | where {|block| $block | is-description }
+                | each { lines | first | str replace --regex '^#\s*' '' }
+
+            {
+                value: ($f.name | path parse | get stem)
+                description: (
+                    [
+                        (stack-commands $f.name | length | if $in == 1 { '1 command' } else { $'($in) commands' })
+                        ($f.modified | date humanize)
+                        ...$about
+                    ]
+                    | str join ' · '
+                )
+            }
+        }
+
+    # Why no sort: the newest stack, the one an agent just wrote, comes first
+    {completions: $completions options: {sort: false}}
+}
+
+def stacks-dir []: nothing -> path {
+    $env.CMD_STACK_DIR? | default $default_dir | path expand
+}
+
+# The log of the shows of loaded commands, one JSON object per line.
+# Not a file next to each stack because: completion lists the folder.
+def shown-log []: nothing -> path {
+    stacks-dir | path join shown.jsonl
+}
+
+# A name in the stacks folder first, then a path
+def stack-path [stack: string]: nothing -> path {
+    let named = stacks-dir | path join $'($stack).nu'
+    let given = $stack | path expand
+
+    if not ($named | path exists) and not ($given | path exists) {
+        error make {msg: $'no stack ($stack): neither ($named) nor a file at that path'}
+    }
+
+    if ($named | path exists) { $named } else { $given }
+}
+
+def stack-blocks [file: path]: nothing -> list<string> {
+    open --raw $file
+    | split row --regex '\n\s*\n'
+    | str trim
+    | where ($it | is-not-empty)
+}
+
+def is-description []: string -> bool {
+    lines | all { str trim | str starts-with '#' }
+}
+
+def stack-commands [file: path]: nothing -> list<string> {
+    let blocks = stack-blocks $file
+
+    if ($blocks | is-not-empty) and ($blocks | first | is-description) {
+        $blocks | skip
+    } else {
+        $blocks
+    }
+}
+
+# The sqlite history of the shells.
+# Not `$nu.history-path` because: under `nu --commands` no config sets the
+# sqlite format, and that path names `history.txt`.
+def history-db []: nothing -> path {
+    $nu.default-config-dir | path join history.sqlite3
+}
+
+# Record which command of a stack file this shell showed, and after which
+# history row, so that `cmd-stack runs` finds the row that ran it.
+# Why at the show and not in a `pre_execution` hook: the user does not want
+# cmd-stack to install hooks.
+def report-shown [stack: path index: int command: string]: nothing -> nothing {
+    # Why `%`: this module exports its own `history` command
+    let session = %history session
+    let db = history-db
+    let last = if ($db | path exists) {
+        open $db
+        | query db 'select max(id) as id from history where session_id = ?' --params [$session]
+        | get 0.id
+    }
+    let log = shown-log
+
+    mkdir ($log | path dirname)
+    {
+        stack: $stack
+        index: $index
+        command: $command
+        pane: $env.ZELLIJ_PANE_ID?
+        zellij_session: $env.ZELLIJ_SESSION_NAME?
+        nu_session: $session
+        history_id: $last
+        at: (date now)
+    }
+    | to json --raw
+    | $in + "\n"
+    | save --append $log
 }
 
 # Apply keybindings with conflict detection.
@@ -60,7 +242,7 @@ def --env cmd-push [cmd: string] {
 # Conflicts are reported — use --force to override them.
 def --env apply-keybindings [
     --force  # Override conflicting keybindings
-    --quiet  # Don't print information message 
+    --quiet  # Don't print information message
 ] {
     let bindings = $in
     let normalize_mod = {|m| $m | split row '_' | sort | str join '_' }
@@ -152,9 +334,10 @@ def --env cmd-cycle [
         $"# You are at the beginning of the stack. Use the `ctrl+alt+k` keybinding or `cmd-stack next`."
     } else {
         $env.cmd-stack.index = $index
+        let command = $env.cmd-stack.stack | get $index
 
-        $env.cmd-stack.stack
-        | get $index
+        if $env.cmd-stack.source? != null { report-shown $env.cmd-stack.source $index $command }
+        $command
     }
     | commandline edit --replace $in
 }
